@@ -1,0 +1,47 @@
+defaults:
+  experiment:
+    model_file: output/<EXP>.mod
+    hyp_file: output/<EXP>.hyp
+    out_file: output/<EXP>.out
+    err_file: output/<EXP>.err
+    run_for_epochs: 25
+    eval_metrics: bleu,wer
+  train:
+    default_layer_dim: 512
+    batch_strategy: 'shuffle'
+    trainer: 'adam'
+    learning_rate: 0.002
+    lr_decay: 0.5
+    dropout: 0.1
+    dev_metrics: bleu
+    training_corpus: !BilingualTrainingCorpus
+      train_src: /pylon5/ci560op/hasegawa/data/8K_mscoco/train/im2ph/cnnfeats.npz
+      train_trg: /pylon5/ci560op/hasegawa/data/8K_mscoco/train/im2ph/phones_ref.txt
+      dev_src: /pylon5/ci560op/hasegawa/data/8K_mscoco/dev/im2ph/cnnfeats.npz
+      dev_trg: /pylon5/ci560op/hasegawa/data/8K_mscoco/dev/im2ph/phones_ref.txt
+    corpus_parser: !BilingualCorpusParser
+      src_reader: !ContVecReader
+        transpose: True
+      trg_reader: !PlainTextReader {}
+    model: !DefaultTranslator
+      src_embedder: !NoopEmbedder
+        emb_dim: 512
+      encoder: !PyramidalLSTMEncoder
+        layers: 1
+        input_dim: 512
+        hidden_dim: 128
+      attender: !StandardAttender
+        hidden_dim: 64
+        state_dim: 64
+        input_dim: 128
+      trg_embedder: !SimpleWordEmbedder
+        emb_dim: 64  ### emb_dim is small because the trg vocab is phones
+      decoder: !MlpSoftmaxDecoder
+        layers: 1
+        mlp_hidden_dim: 1024 ### mlp_hidden_dim is large because emb_dim is small, and b/c we need long memory
+  decode:
+    src_file: /pylon5/ci560op/hasegawa/data/8K_mscoco/im2ph/test/cnnfeats.npz
+  evaluate:
+    ref_file: /pylon5/ci560op/hasegawa/data/8K_mscoco/im2ph/test/phones_ref.txt
+
+im2ph_ref:
