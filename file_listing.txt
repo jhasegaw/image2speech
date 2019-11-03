@@ -4,7 +4,7 @@ flickr8k/flickr_image_urls.txt
 flickr8k/flickr_texts.txt
 flickr8k/vgg16_flickr8k_cnnfeats_env.yaml
 flickr8k/vgg16_flickr8k_cnnfeats.py
-flickr8k/flickr40k_im2ph_cnnfeats.py
+flickr8k/convert_data_to_xnmt.py
 flickr8k/image_train.txt
 flickr8k/image_test.txt
 flickr8k/image_val.txt

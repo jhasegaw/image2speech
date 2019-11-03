@@ -116,7 +116,7 @@ if [ -n "`echo $steps | grep 07`" ]; then
     echo ""
     echo "07: Sort transcriptions and features into train, dev and test sets"
     cd flickr8k
-    python3 flickr40k_im2ph_cnnfeats.py
+    python3 convert_data_to_xnmt.py
     cd ..
 fi
 

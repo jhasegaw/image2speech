@@ -46,13 +46,13 @@
     trg_file: flickr40k_phones_train.txt
     dev_tasks:
       - !LossEvalTask
-        src_file: flickr40k_cnnfeats_dev.h5
-        ref_file: flickr40k_phones_dev.txt
+        src_file: flickr40k_cnnfeats_val.h5
+        ref_file: flickr40k_phones_val.txt
       - !AccuracyEvalTask
         eval_metrics: bleu,wer
-        src_file: flickr40k_cnnfeats_dev.h5
-        ref_file: flickr40k_phones_dev.txt
-        hyp_file: flickr40k_phones_dev_hyp.txt
+        src_file: flickr40k_cnnfeats_val.h5
+        ref_file: [flickr40k_phones_val0.txt,flickr40k_phones_val1.txt,flickr40k_phones_val2.txt,flickr40k_phones_val3.txt,flickr40k_phones_val4.txt]
+        hyp_file: flickr40k_phones_val_hyp.txt
         inference: !AutoRegressiveInference
           batcher: !InOrderBatcher
             _xnmt_id: inference_batcher
@@ -62,7 +62,7 @@
     - !AccuracyEvalTask
       eval_metrics: bleu,wer
       src_file: flickr40k_cnnfeats_test.h5
-      ref_file: flickr40k_phones_test.txt
+      ref_file: [flickr40k_phones_test0.txt,flickr40k_phones_test1.txt,flickr40k_phones_test2.txt,flickr40k_phones_test3.txt,flickr40k_phones_test4.txt]
       hyp_file: flickr40k_phones_test_hyp.txt
       inference: !AutoRegressiveInference
         batcher: !Ref { name: inference_batcher }
