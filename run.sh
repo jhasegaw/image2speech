@@ -19,7 +19,7 @@
 # out, after you have done them once.
 #
 #####################################################################
-steps="11 12"
+steps="09 11 12"
 
 #####################################################################
 # Step 01
@@ -60,7 +60,7 @@ if [ -n "`echo $steps | grep 03`" ]; then
     echo "#######################################################################"
     echo ""
     echo "03: Create a conda environment for Davi Frossard's TensorFlow version of VGG16"
-    conda env create -f flickr8k/vgg16_flickr8k_cnnfeats_env.yaml
+    conda env create -f flickr8k/yaml/vgg16_flickr8k_cnnfeats_env.yaml
 fi
 
 #####################################################################
@@ -72,7 +72,7 @@ if [ -n "`echo $steps | grep 04`" ]; then
     echo "04: Run the VGG16 model"
     cd flickr8k
     conda activate vgg16_flickr8k_cnnfeats_env
-    python vgg16_flickr8k_cnnfeats.py
+    python py/vgg16_flickr8k_cnnfeats.py
     cd ..
 fi
 
@@ -116,7 +116,7 @@ if [ -n "`echo $steps | grep 07`" ]; then
     echo ""
     echo "07: Sort transcriptions and features into train, dev and test sets"
     cd flickr8k
-    python3 convert_data_to_xnmt.py
+    python3 py/convert_data_to_xnmt.py
     cd ..
 fi
 
@@ -145,11 +145,11 @@ if [ -n "`echo $steps | grep 09`" ]; then
     cd flickr8k
     conda activate xnmt
     # 128d attender, with and w/o decoder norm
-    python ../xnmt/xnmt/xnmt_run_experiments.py --settings=debug im2ph128att.yaml
-    python ../xnmt/xnmt/xnmt_run_experiments.py --settings=debug im2ph128att_0norm.yaml
+    python ../xnmt/xnmt/xnmt_run_experiments.py --settings=debug yaml/im2ph128att.yaml
+    python ../xnmt/xnmt/xnmt_run_experiments.py --settings=debug yaml/im2ph128att_0norm.yaml
     # 64d attender, with and w/o decoder norm
-    python ../xnmt/xnmt/xnmt_run_experiments.py --settings=debug im2ph64att.yaml
-    python ../xnmt/xnmt/xnmt_run_experiments.py --settings=debug im2ph64att_0norm.yaml
+    python ../xnmt/xnmt/xnmt_run_experiments.py --settings=debug yaml/im2ph64att.yaml
+    python ../xnmt/xnmt/xnmt_run_experiments.py --settings=debug yaml/im2ph64att_0norm.yaml
     conda deactivate
     cd ..
 fi
@@ -210,17 +210,16 @@ if [ -n "`echo $steps | grep 11`" ]; then
     cp -r ../flickr8k/flickr_audio/wavs wav
     awk '{printf("( %s \"",$2);for(i=3;i<NF;i++){printf("%s ",$i)};printf("%s\" )\n",$NF);}' ../flickr8k/flickr40k_tagged_train.txt > etc/txt.done.data
 
-    ############################################33
-    # TODO: at this point, generate from
-    # vocab.txt (the phones) a dictionary like festival/lib/dicts/cmu/cmulex.scm.
-    # Create code like festival/lib/lexicons.scm::setup_cmu_lex to load it,
-    # insert that in the preamble of
-    # flickr8k/flickr8k_cg/festvox/image2speech_L1phones_flickr8k_cg_lexicon.scm,
-    # then change it to (lex.select "flickr8k")
+    # Create "phonedict.txt", a dictionary that maps each phone to itself
+    python ../flickr8k/py/phonedict.py ../flickr8k/vocab.txt phonedict.txt
+    # Copy its code into festvox/image2speech_L1phones_flickr8k.scm
+    cp ../flickr8k/scm/phonedict.scm festvox/image2speech_L1phones_flickr8k.scm
+
+    cd ..
 fi
 
 ###############################################################################
-# Step 12: use do_build to generate wrong prompts -- just trying to see what's required
+# Step 12: use do_build to generate prompts
 if [ -n "`echo $steps | grep 12`" ]; then
     source ~/.bashrc  # Get the necessary path variables
     echo "#######################################################################"
@@ -232,7 +231,9 @@ if [ -n "`echo $steps | grep 12`" ]; then
 
     ./bin/do_build build_prompts
     ./bin/do_build label
-    ./bin/do_build build_utts    
+    ./bin/do_build build_utts
+
+    cd ..
 fi
 
 ###############################################################################
@@ -253,6 +254,8 @@ if [ -n "`echo $steps | grep 13`" ]; then
     ./bin/do_clustergen generate_statenames
     ./bin/do_clustergen cluster
     ./bin/do_clustergen dur
+
+    cd ..
 fi
     
 # Step 14: Testing: run festival(?) to generate output speech from the files
