@@ -8,7 +8,10 @@ flickr8k/convert_data_to_xnmt.py
 flickr8k/image_train.txt
 flickr8k/image_test.txt
 flickr8k/image_val.txt
-flickr8k/flickr8k_im2ph.yaml
+flickr8k/im2ph128att.yaml
+flickr8k/im2ph64att.yaml
+flickr8k/im2ph128att_0norm.yaml
+flickr8k/im2ph64att_0norm.yaml
 speechcoco/vgg16_8K_mscoco_cnnfeats.py
 speechcoco/8K_mscoco_im2ph_cnnfeats.py
 speechcoco/8K_mscoco_im2ph.yaml
