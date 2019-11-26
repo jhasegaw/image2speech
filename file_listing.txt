@@ -17,3 +17,8 @@ flickr8k/scm/phonedict.scm
 speechcoco/vgg16_8K_mscoco_cnnfeats.py
 speechcoco/8K_mscoco_im2ph_cnnfeats.py
 speechcoco/8K_mscoco_im2ph.yaml
+phones2words/align.sh
+phones2words/example.fsm
+phones2words/lexicon.fst
+phones2words/vocab.letterlist
+

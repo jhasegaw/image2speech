@@ -9,7 +9,7 @@
 # gradient normalization problem that I haven't been able to figure out.
 # I'm leaving it to run for 5 iterations, but the extra two seem useless.
 !Experiment
-  name: im2ph128att
+  name: im2ph128att_0norm
   exp_global: !ExpGlobal
     save_num_checkpoints: 2
     default_layer_dim: 128
@@ -58,7 +58,7 @@
         eval_metrics: bleu,wer
         src_file: flickr40k_cnnfeats_val.h5
         ref_file: [flickr40k_phones_val0.txt,flickr40k_phones_val1.txt,flickr40k_phones_val2.txt,flickr40k_phones_val3.txt,flickr40k_phones_val4.txt]
-        hyp_file: flickr40k_phones_val_hyp128att.txt
+        hyp_file: flickr40k_phones_val_hyp128att_0norm.txt
         inference: !AutoRegressiveInference
           batcher: !InOrderBatcher
             _xnmt_id: inference_batcher
@@ -69,6 +69,6 @@
       eval_metrics: bleu,wer
       src_file: flickr40k_cnnfeats_test.h5
       ref_file: [flickr40k_phones_test0.txt,flickr40k_phones_test1.txt,flickr40k_phones_test2.txt,flickr40k_phones_test3.txt,flickr40k_phones_test4.txt]
-      hyp_file: flickr40k_phones_test_hyp128att.txt
+      hyp_file: flickr40k_phones_test_hyp128att_0norm.txt
       inference: !AutoRegressiveInference
         batcher: !Ref { name: inference_batcher }

@@ -19,7 +19,7 @@
 # out, after you have done them once.
 #
 #####################################################################
-steps="09 11 12"
+steps="09"
 
 #####################################################################
 # Step 01
@@ -206,7 +206,7 @@ if [ -n "`echo $steps | grep 11`" ]; then
     cd flickr8k_cg
     $FESTVOXDIR/src/clustergen/setup_cg image2speech L1phones flickr8k_cg
 
-    if [ -d wav ]; then rmdir wav; fi
+    if [ -d wav ]; then rm -rf wav; fi
     cp -r ../flickr8k/flickr_audio/wavs wav
     awk '{printf("( %s \"",$2);for(i=3;i<NF;i++){printf("%s ",$i)};printf("%s\" )\n",$NF);}' ../flickr8k/flickr40k_tagged_train.txt > etc/txt.done.data
 
