@@ -49,9 +49,9 @@ for split in splits:
 ###################################################################################
 # Write the training data
 num_written = 0
-with open('flickr40k_phones_train.txt','w') as textfile:
-    with open('flickr40k_tagged_train.txt','w') as tagfile:
-        with h5py.File('flickr40k_cnnfeats_train.h5', "w") as h5file:
+with open('phones/train.txt','w') as textfile:
+    with open('tagged/train.txt','w') as tagfile:
+        with h5py.File('cnnfeats_train.h5', "w") as h5file:
             for imagename in sorted(transcripts['train'].keys()):
                 for (cindex,phones) in enumerate(transcripts['train'][imagename]):
                     textfile.write(' '.join(phones)+"\n")
@@ -62,12 +62,12 @@ with open('flickr40k_phones_train.txt','w') as textfile:
 ###################################################################################
 # Write the test and val data
 for split in ['val','test']:
-    with h5py.File('flickr40k_cnnfeats_%s.h5'%(split), "w") as h5file:
+    with h5py.File('cnnfeats_%s.h5'%(split), "w") as h5file:
         for (nwritten,imagename) in enumerate(sorted(transcripts[split].keys())):
             h5file.create_dataset('%d'%(nwritten), data=all_images[imagename])
     for cindex in range(5):        
-        with open('flickr40k_phones_%s%d.txt'%(split,cindex),'w') as textfile:
-            with open('flickr40k_tagged_%s%d.txt'%(split,cindex),'w') as tagfile:
+        with open('phones/%s%d.txt'%(split,cindex),'w') as textfile:
+            with open('tagged/%s%d.txt'%(split,cindex),'w') as tagfile:
                 for (nwritten,imagename) in enumerate(sorted(transcripts[split].keys())):
                     phones=transcripts[split][imagename][cindex]
                     textfile.write(' '.join(phones)+"\n")

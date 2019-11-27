@@ -1,0 +1,78 @@
+# This is a config file for image-to-phone training.
+# This is based on the XNMT 12_speech.yaml example.
+# Compared to the conventional attentional model, we remove input embeddings,
+# instead directly read in a feature vector the pyramidal LSTM reduces length of
+# the input sequence by a factor of 2 per layer (except for the first layer).
+# Output units should be characters according to the paper.
+#
+# Right now, this stops converging after the 3rd iteration, apparently b/c of a
+# gradient normalization problem that I haven't been able to figure out.
+# I'm leaving it to run for 5 iterations, but the extra two seem useless.
+!Experiment
+  name: im2ph64att
+  exp_global: !ExpGlobal
+    save_num_checkpoints: 2
+    default_layer_dim: 128
+    dropout: 0.33333
+  model: !DefaultTranslator
+    src_embedder: !NoopEmbedder
+      emb_dim: 512
+    encoder: !PyramidalLSTMSeqTransducer
+      layers: 3
+      reduce_factor: 2
+      downsampling_method: concat      
+      input_dim: 512
+      hidden_dim: 128
+    attender: !MlpAttender
+      hidden_dim: 64
+    decoder: !AutoRegressiveDecoder
+      embedder: !SimpleWordEmbedder
+        emb_dim: 128
+        word_dropout: 0.33333
+        fix_norm: 1
+      rnn: !UniLSTMSeqTransducer
+        layers: 1
+        hidden_dim: 128
+      input_feeding: True
+      bridge: !CopyBridge {}
+      scorer: !Softmax
+        label_smoothing: 0.1      
+    src_reader: !H5Reader
+      transpose: True
+    trg_reader: !PlainTextReader
+      vocab: !Vocab {vocab_file: vocab.txt}
+      output_proc: none
+  train: !SimpleTrainingRegimen
+    run_for_epochs: 5
+    batcher: !ShuffleBatcher
+      pad_src_to_multiple: 4
+      batch_size: 5
+    trainer: !AdamTrainer {}
+    src_file: cnnfeats_train.h5
+    trg_file: phones/train.txt
+    dev_tasks:
+      - !LossEvalTask
+        src_file: cnnfeats_val.h5
+        ref_file: phones/val0.txt
+      - !AccuracyEvalTask
+        eval_metrics: bleu,wer
+        src_file: cnnfeats_val.h5
+        ref_file: [phones/val0.txt,phones/val1.txt,phones/val2.txt,phones/val3.txt,phones/val4.txt]
+        hyp_file: out/val_hyp64att.txt
+        inference: !AutoRegressiveInference
+          batcher: !InOrderBatcher
+            _xnmt_id: inference_batcher
+            pad_src_to_multiple: 4
+            batch_size: 1
+          search_strategy: !BeamSearch
+            beam_size: 20
+  evaluate:
+    - !AccuracyEvalTask
+      eval_metrics: bleu,wer
+      src_file: cnnfeats_test.h5
+      ref_file: [phones/test0.txt,phones/test1.txt,phones/test2.txt,phones/test3.txt,phones/test4.txt]
+      hyp_file: out/test_hyp64att.txt
+      inference: !AutoRegressiveInference
+        batcher: !Ref { name: inference_batcher }
+        search_strategy: !BeamSearch
+          beam_size: 20

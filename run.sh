@@ -30,12 +30,10 @@ if [ -n "`echo $steps | grep 01`" ]; then
     echo "01: Download Davi Frossard's Tensorflow implementation of VGG16"
     echo "Karen Simonyan and Andrew Zisserman, ICLR 2015,"
     echo "Very Deep Convolutional Networks for Large-Scale Image Recognition"
-    mkdir -p frossard_vgg16
     wget https://www.cs.toronto.edu/~frossard/vgg16/vgg16.py  -nd -P frossard_vgg16
     wget https://www.cs.toronto.edu/~frossard/vgg16/imagenet_classes.py  -nd -P frossard_vgg16
     wget https://www.cs.toronto.edu/~frossard/vgg16/vgg16_weights.npz -nd -P frossard_vgg16
     # Remove a couple of lines that were written for some type of python 2.
-    # Change the 
     grep -v 'print' frossard_vgg16/vgg16.py | grep -v 'for p in preds' > frossard_vgg16/vgg16class.py
 fi
     
@@ -55,12 +53,12 @@ fi
 
 #####################################################################
 # Step 03
-# pre-req: flickr8k/vgg16_flickr8k_cnnfeats_env.yaml
+# pre-req: frossard_vgg16/vgg16_cnnfeats_env.yaml
 if [ -n "`echo $steps | grep 03`" ]; then
     echo "#######################################################################"
     echo ""
     echo "03: Create a conda environment for Davi Frossard's TensorFlow version of VGG16"
-    conda env create -f flickr8k/yaml/vgg16_flickr8k_cnnfeats_env.yaml
+    conda env create -f frossard_vgg16/vgg16_cnnfeats_env.yaml
 fi
 
 #####################################################################
@@ -69,9 +67,9 @@ fi
 if [ -n "`echo $steps | grep 04`" ]; then
     echo "#######################################################################"
     echo ""
-    echo "04: Run the VGG16 model"
+    echo "04: Run the VGG16 model to generate cnnfeats"
     cd flickr8k
-    conda activate vgg16_flickr8k_cnnfeats_env
+    conda activate vgg16_cnnfeats_env
     python py/vgg16_flickr8k_cnnfeats.py
     cd ..
 fi
@@ -145,11 +143,9 @@ if [ -n "`echo $steps | grep 09`" ]; then
     cd flickr8k
     conda activate xnmt
     # 128d attender, with and w/o decoder norm
-    python ../xnmt/xnmt/xnmt_run_experiments.py --settings=debug yaml/im2ph128att.yaml
-    python ../xnmt/xnmt/xnmt_run_experiments.py --settings=debug yaml/im2ph128att_0norm.yaml
+    python ../xnmt/xnmt/xnmt_run_experiments.py xnmt_work/im2ph128att.yaml
     # 64d attender, with and w/o decoder norm
-    python ../xnmt/xnmt/xnmt_run_experiments.py --settings=debug yaml/im2ph64att.yaml
-    python ../xnmt/xnmt/xnmt_run_experiments.py --settings=debug yaml/im2ph64att_0norm.yaml
+    python ../xnmt/xnmt/xnmt_run_experiments.py xnmt_work/im2ph64att.yaml
     conda deactivate
     cd ..
 fi
