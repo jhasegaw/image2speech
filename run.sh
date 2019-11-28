@@ -142,10 +142,27 @@ if [ -n "`echo $steps | grep 09`" ]; then
     echo "09: Train the CNNFEATS-to-phones translation model using XNMT on force-aligned phones"
     cd flickr8k
     conda activate xnmt
-    # 128d attender, with and w/o decoder norm
-    python ../xnmt/xnmt/xnmt_run_experiments.py xnmt_work/im2ph128att.yaml
-    # 64d attender, with and w/o decoder norm
-    python ../xnmt/xnmt/xnmt_run_experiments.py xnmt_work/im2ph64att.yaml
+    for batcher in TrgBatcher SentShuffleBatcher; do
+	for default_layer_dim in 64 128 256; do
+	    for hidden_dim in 32 64 128; do
+		filename=im2ph_${batcher}_${default_layer_dim}_${hidden_dim}
+		echo "#######################################################################"
+		echo "# creating and testing ${filename}.yaml"
+		cat xnmt_work/im2ph.yaml |
+		    sed "s/TrgBatcher/${batcher}/" |
+		    sed "s/default_layer_dim: 128/default_layer_dim: ${default_layer_dim}/" |
+		    sed "s/hidden_dim: 128/hidden_dim: ${hidden_dim}/" |
+		    sed "s/name: im2ph/name: ${filename}/" |
+		    sed "s:out/val.txt:out/val_${batcher}_${default_layer_dim}_${hidden_dim}.txt:" |
+		    sed "s:out/text.txt:out/test_${batcher}_${default_layer_dim}_${hidden_dim}.txt:" |
+		    cat > xnmt_work/${filename}.yaml
+		if [ -f xnmt_work/logs/${filename}.log ]; then
+		    rm xnmt_work/logs/${filename}.log
+		fi
+		python ../xnmt/xnmt/xnmt_run_experiments.py xnmt_work/${filename}.yaml
+	    done
+	done
+    done
     conda deactivate
     cd ..
 fi

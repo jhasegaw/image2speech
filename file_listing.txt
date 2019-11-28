@@ -8,8 +8,7 @@ flickr8k/py/convert_data_to_xnmt.py
 flickr8k/splits/image_train.txt
 flickr8k/splits/image_test.txt
 flickr8k/splits/image_val.txt
-flickr8k/xnmt_work/im2ph128att.yaml
-flickr8k/xnmt_work/im2ph64att.yaml
+flickr8k/xnmt_work/im2ph.yaml
 flickr8k/py/phonedict.py
 flickr8k/scm/phonedict.scm
 speechcoco/vgg16_8K_mscoco_cnnfeats.py
