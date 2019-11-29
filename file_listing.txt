@@ -3,6 +3,7 @@ file_listing.txt
 frossard_vgg16/vgg16_cnnfeats_env.yaml
 flickr8k/flickr_image_urls.txt
 flickr8k/flickr_texts.txt
+flickr8k/dutch_asr_output.txt
 flickr8k/py/vgg16_flickr8k_cnnfeats.py
 flickr8k/py/convert_data_to_xnmt.py
 flickr8k/splits/image_train.txt
