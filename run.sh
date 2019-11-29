@@ -19,7 +19,7 @@
 # out, after you have done them once.
 #
 #####################################################################
-steps="09"
+steps="07 09"
 
 #####################################################################
 # Step 01
@@ -141,6 +141,7 @@ if [ -n "`echo $steps | grep 09`" ]; then
     echo ""
     echo "09: Train the CNNFEATS-to-phones translation model using XNMT on force-aligned phones"
     cd flickr8k
+    if [ ! -d xnmt_work ]; then mkdir xnmt_work; fi
     conda activate xnmt
     batcher=SentShuffleBatcher
     default_layer_dim=64
@@ -151,7 +152,7 @@ if [ -n "`echo $steps | grep 09`" ]; then
 	filename=${lang}_im2ph_${pset}
 	echo "#######################################################################"
 	echo "# creating and testing ${filename}.yaml"
-	cat xnmt_work/im2ph.yaml |
+	cat im2ph.yaml |
 	    sed "s/name: im2ph/name: ${filename}/" |
 	    sed "s/SentShuffleBatcher/${batcher}/" |
 	    sed "s/default_layer_dim: 64/default_layer_dim: ${default_layer_dim}/" |
@@ -169,6 +170,8 @@ if [ -n "`echo $steps | grep 09`" ]; then
 	fi
 	python ../xnmt/xnmt/xnmt_run_experiments.py xnmt_work/${filename}.yaml
     done
+
+    python py/score_xnmt_outputs.py
     conda deactivate
     cd ..
 fi
@@ -277,13 +280,31 @@ if [ -n "`echo $steps | grep 13`" ]; then
     cd ..
 fi
     
-# Step 14: Testing: run festival(?) to generate output speech from the files
-# flickr8k/flickr40k_phones_val_hyp*.txt and flickr8k/flickr40k_phones_test_hyp*.txt
-# using the voice image2speech_L1phones_flickr8k.
-
-
-
-
+###############################################################################
+# Step 14: Testing: run festival to generate output speech
+if [ -n "`echo $steps | grep 13`" ]; then
+    source ~/.bashrc  # Get the necessary path variables
+    echo "#######################################################################"
+    echo ""
+    echo "14: Run clustergen to generate the synthetic voice image2speech_L1phones_flickr8k"
+    
+    cd flickr8k
+    nlines=`wc xnmt_work/out/eng_test_SentShuffleBatcher_64_32.txt | awk '{print $1}'`
+    params=SentShuffleBatcher_64_32
+    if [ ! -d wav_${params} ]; then
+	mkdir wav_${params};
+    fi
+    for lang in eng nld; do
+	for subc in val test; do
+	    for n in $(seq 1 $nlines); do
+		head -$n xnmt_work/out/${lang}_${subc}_${params}.txt |
+		    tail -1 |
+		    festival --libdir ../flickr8k_cg -b --language L1phones --tts |
+		    cat > wav_${params}/${lang}_${subc}_${n}.wav
+	    done
+	done
+    done
+fi
 
 
 
