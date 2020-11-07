@@ -19,7 +19,29 @@
 # out, after you have done them once.
 #
 #####################################################################
-steps="07 09"
+if [ $# -eq 0 ]; then
+    echo "
+    Usage: ./run.sh [STEP]+
+    
+    Where STEP is a two-digit number:
+    01: Download Frossard's implementation of VGG16
+    02: Download the flickr8k images
+    03: Create a conda environment for Davi Frossard's TensorFlow version of VGG16
+    04: Run the VGG16 model to generate cnnfeats
+    05: Download the audio captions
+    06: Download the forced alignments
+    07: Sort transcriptions and features into train, dev and test sets
+    08: Download XNMT; create a new conda env for it; install requirements in the conda env
+    09: Train the CNNFEATS-to-phones translation model using XNMT on force-aligned phones
+    10: Download festival and festvox
+    11: Create the clustergen working directory; copy wavs and phone transcriptions
+    12: Run clustergen do_build scripts, to generate prompt files for clustergen
+    13: Run clustergen to generate the synthetic voice image2speech_L1phones_flickr8k
+    14: Run clustergen to generate the synthetic voice image2speech_L1phones_flickr8k
+    "
+    exit
+fi
+steps="$@"
 
 #####################################################################
 # Step 01
